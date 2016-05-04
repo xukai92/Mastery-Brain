@@ -6,24 +6,20 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
-    masteries = api.getMasteriesBySummonerAndChampion("FishKay", 38)
-    return str(masteries)
+def root():
+    return redirect(url_for('search'))
 
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('search'))
-    print 3
+        summonerName = request.form['summonerName']
+        championName = request.form['championName']
+        region = request.form['region']
+        print summonerName, championName, region
+        # TODO: pass the formatted masteries to template
+        return render_template('mastery.html', error=error)
     return render_template('search.html', error=error)
 
 

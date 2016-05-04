@@ -357,7 +357,14 @@ def printMasteriesOfASummonerWithAChampion(summonerName, championName, region="e
 
 
 def main():
-    printMasteriesOfASummonerWithAChampion("Hide on bush", "Corki", "kr")
+    cd = genChampionDict()
+    cns = cd.keys()
+    cns.sort()
+    for cn in cns:
+        print '                  <option value="{cn}">{cn}</option>'.format(
+            cn=cn
+        )
+    # printMasteriesOfASummonerWithAChampion("Hide on bush", "Corki", "kr")
 
 
 if __name__ == "__main__":
