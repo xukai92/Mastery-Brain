@@ -69,8 +69,8 @@ def getMatchList(params):
           '/api/lol/{region}/v2.2/matchlist/by-summoner/{summonerId}' \
           '?api_key={api_key}'
     url = url.format(region=params["region"],
-                     summonerId=params["summonerId"],   # multiple summoner names should be
-                     api_key=API_KEY)   # in a form of "name1,name2"
+                     summonerId=params["summonerId"],
+                     api_key=API_KEY)
     response = urllib.urlopen(url)      # get response from API
     responseStr = response.read()       # read the response into string
     jsonDict = json.loads(responseStr)  # convert the string into JSON dictionary
@@ -145,12 +145,141 @@ def getMatchByMatchId(params):
           '/api/lol/{region}/v2.2/match/{matchId}' \
           '?api_key={api_key}'
     url = url.format(region=params["region"],
-                     matchId=params["matchId"],         # multiple summoner names should be
-                     api_key=API_KEY)   # in a form of "name1,name2"
+                     matchId=params["matchId"],
+                     api_key=API_KEY)
     response = urllib.urlopen(url)      # get response from API
     responseStr = response.read()       # read the response into string
     jsonDict = json.loads(responseStr)  # convert the string into JSON dictionary
     return filterJSONDict(jsonDict)
+
+
+def getChampionInfo(params):
+    """
+    Get all champion info
+    :param params: {"region": "..."}
+    :return: {
+                "data": {
+                    "MonkeyKing": {
+                      "title": "the Monkey King",
+                      "id": 62,
+                      "key": "MonkeyKing",
+                      "name": "Wukong"
+                    },
+                    ...
+                },
+                "version": "6.8.1",
+                "type": "champion"
+             }
+    """
+    url = 'https://global.api.pvp.net' \
+          '/api/lol/static-data/{region}/v1.2/champion' \
+          '?api_key={api_key}'
+    url = url.format(region=params["region"],
+                     api_key=API_KEY)
+    response = urllib.urlopen(url)      # get response from API
+    responseStr = response.read()       # read the response into string
+    jsonDict = json.loads(responseStr)  # convert the string into JSON dictionary
+    return filterJSONDict(jsonDict)
+
+
+def championId2Name(championId, region="euw"):
+    """
+    Map champion ID to champion name.
+    :param championId: champion ID
+    :param region: region
+    :return: champion name
+    """
+    championInfo = getChampionInfo({"region": region})
+    if championInfo:
+        for championName in championInfo["data"].keys():    # see getChampionInfo() for JSON response structure
+            if championInfo["data"][championName]["id"] == championId:
+                return championName
+        return None
+    else:
+        exit(1)
+
+
+def genChampionDict(region="euw"):
+    """
+    Generate champion dictionary.
+    :param region: region
+    :return: {championName: championId}
+    """
+    championInfo = getChampionInfo({"region": region})
+    if championInfo:
+        championDict = {}
+        for championName in championInfo["data"].keys():
+            championDict[championName] = championInfo["data"][championName]["id"]
+        return championDict
+    else:
+        exit(1)
+
+
+def getMasteryInfo(params):
+    """
+    Get mastery info, including master ID, name and image.
+    :param params: {"region": "..."}
+    :return: {
+                "data": {
+                    "6142": {
+                      "description": [
+                        "Deal 2.5% increased damage to targets with impaired movement (slow, stun, root, taunt, etc.)"
+                      ],
+                      "id": 6142,
+                      "name": "Oppressor",
+                      "image": {
+                        "w": 48,
+                        "full": "6121.png",
+                        "sprite": "mastery0.png",
+                        "group": "gray_mastery",
+                        "h": 48,
+                        "y": 384,
+                        "x": 240
+                      }
+                    },
+                    ...
+                },
+                ,
+                "version": "6.8.1",
+                "type": "mastery"
+             }
+    """
+    url = 'https://global.api.pvp.net' \
+          '/api/lol/static-data/euw/v1.2/mastery?masteryListData=image&' \
+          'api_key={api_key}'
+    url = url.format(region=params["region"],
+                     api_key=API_KEY)
+    response = urllib.urlopen(url)      # get response from API
+    responseStr = response.read()       # read the response into string
+    jsonDict = json.loads(responseStr)  # convert the string into JSON dictionary
+    return filterJSONDict(jsonDict)
+
+
+def genMasteryDict(region="euw"):
+    """
+    Generate mastery dictionary.
+    :param region:
+    :return: {masteryId: {"name": masteryName, "description": [...]}}
+    """
+    masteryInfo = getMasteryInfo({"region": region})
+    if masteryInfo:
+        masteryDict = {}
+        for masteryId in masteryInfo["data"].keys():
+            masteryDict[int(masteryId)] = masteryInfo["data"][masteryId]
+        return masteryDict
+    else:
+        exit(1)
+
+
+# TODO: finish formatMasteries
+def formatMasteries(masteries, masteryDict):
+    """
+    Format masteries to render to .html
+    :param masteries:
+    :param masteryDict:
+    :return:
+    """
+    pass
 
 
 def printJSONDict(jsonDict):
@@ -161,14 +290,15 @@ def printJSONDict(jsonDict):
     print json.dumps(jsonDict, sort_keys=False, indent=2)
 
 
-def getMasteriesBySummonerAndChampion(summonerName, championId):
+def getMasteriesBySummonerAndChampion(summonerName, championId, region):
     """
     Find a summoner's latest mastery page of given champion
     :param summonerName: summoner's name
     :param championId: champion ID
+    :param region: region
     :return: the mastery page
     """
-    summonerDict = getSummoners({"region": "euw", "summonerNames": summonerName})
+    summonerDict = getSummoners({"region": region, "summonerNames": summonerName})
 
     # Get summoner's ID
     if summonerDict:
@@ -178,7 +308,7 @@ def getMasteriesBySummonerAndChampion(summonerName, championId):
         exit(1)
 
     # Get summoner's match list
-    matchList = getMatchList({"region": "euw", "summonerId": summonerId})
+    matchList = getMatchList({"region": region, "summonerId": summonerId})
     if matchList:
         # Get summoner's match ID list by specifying champion ID
         filteredMatchList = filterMatchListByChampion(matchList, championId)
@@ -188,7 +318,7 @@ def getMasteriesBySummonerAndChampion(summonerName, championId):
         exit(1)
 
     # Get match by match ID
-    match = getMatchByMatchId({"region": "euw", "matchId": latestMatchID})
+    match = getMatchByMatchId({"region": region, "matchId": latestMatchID})
     if match:
         # Get masteries by champion ID
         for participant in match["participants"]:
@@ -198,9 +328,36 @@ def getMasteriesBySummonerAndChampion(summonerName, championId):
         exit(1)
 
 
+def printMasteriesOfASummonerWithAChampion(summonerName, championName, region="euw"):
+    """
+    Print formatted masteries.
+    This function is only for test purpose.
+    :param summonerName: summoner name
+    :param championName: champion name
+    :param region: region
+    """
+    championDict = genChampionDict()
+    print "Summoner |{summonerName}| is recently playing |{championName}| with masteries:".format(
+        summonerName=summonerName,
+        championName=championName
+    )
+
+    championId = championDict[championName] # name to ID
+    masteries = getMasteriesBySummonerAndChampion(summonerName, championId, region)
+    masteryDict = genMasteryDict()
+    for mastery in masteries:
+        print "{masterName} * {rank}:\n  {description}".format(
+            masterName=masteryDict[mastery["masteryId"]]["name"],
+            rank=mastery["rank"],
+            description=masteryDict[mastery["masteryId"]]["description"][mastery["rank"] - 1]
+        )
+        print "  [img] http://ddragon.leagueoflegends.com/cdn/6.9.1/img/mastery/{image}".format(
+            image=masteryDict[mastery["masteryId"]]["image"]["full"]
+        )
+
+
 def main():
-    masteries = getMasteriesBySummonerAndChampion("FishKay", 38)
-    printJSONDict(masteries)
+    printMasteriesOfASummonerWithAChampion("Hide on bush", "Corki", "kr")
 
 
 if __name__ == "__main__":
