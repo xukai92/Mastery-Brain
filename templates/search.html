@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block container %}
+
+  <h3>Search</h3>
+
+  {% include 'error.html' %}
+
+  <form action="{{ url_for('search') }}" method=post>
+      <div class="row">
+        <div class="input-field col s12">
+          <input placeholder="" id="username" type="text" name=username>
+          <label for="flat_name">Username</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input placeholder="" id="password" type=password name=password>
+          <label for="password">Password</label>
+        </div>
+      </div>
+      <div class="row">
+        <input class="btn right" type=submit value=Login>
+      </div>
+  </form>
+
+{% endblock %}

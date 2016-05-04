@@ -290,7 +290,7 @@ def printJSONDict(jsonDict):
     print json.dumps(jsonDict, sort_keys=False, indent=2)
 
 
-def getMasteriesBySummonerAndChampion(summonerName, championId, region):
+def getMasteriesBySummonerAndChampion(summonerName, championId, region="euw"):
     """
     Find a summoner's latest mastery page of given champion
     :param summonerName: summoner's name
