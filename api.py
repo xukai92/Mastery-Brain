@@ -309,7 +309,7 @@ def getMasteriesBySummonerAndChampion(summonerName, championName, region="euw"):
         nameInLowerCase = list(summonerDict)[0]
         summonerId = summonerDict[nameInLowerCase]["id"]
     else:
-        exit(1)
+        exit(1)     # TODO: add error logs
 
     # Get summoner's match list
     matchList = getMatchList({"region": region, "summonerId": summonerId})
