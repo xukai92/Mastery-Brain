@@ -1,3 +1,9 @@
+"""
+API for fetching mastery page from a given summoner.
+"""
+# TODO: add error logs
+
+
 import json
 import urllib
 import confidential
@@ -309,7 +315,7 @@ def getMasteriesBySummonerAndChampion(summonerName, championName, region="euw"):
         nameInLowerCase = list(summonerDict)[0]
         summonerId = summonerDict[nameInLowerCase]["id"]
     else:
-        exit(1)     # TODO: add error logs
+        exit(1)
 
     # Get summoner's match list
     matchList = getMatchList({"region": region, "summonerId": summonerId})
