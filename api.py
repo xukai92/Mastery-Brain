@@ -271,15 +271,16 @@ def genMasteryDict(region="euw"):
         exit(1)
 
 
-# TODO: finish formatMasteries
-def formatMasteries(masteries, masteryDict):
+def formatMasteries(masteries):
     """
     Format masteries to render to .html
-    :param masteries:
-    :param masteryDict:
+    :param masteries: masteries
     :return:
     """
-    pass
+    masterySet = set()
+    for mastery in masteries:
+        masterySet.add(mastery["masteryId"])
+    return masterySet
 
 
 def printJSONDict(jsonDict):
@@ -290,17 +291,20 @@ def printJSONDict(jsonDict):
     print json.dumps(jsonDict, sort_keys=False, indent=2)
 
 
-def getMasteriesBySummonerAndChampion(summonerName, championId, region="euw"):
+def getMasteriesBySummonerAndChampion(summonerName, championName, region="euw"):
     """
     Find a summoner's latest mastery page of given champion
     :param summonerName: summoner's name
-    :param championId: champion ID
+    :param championName: champion name
     :param region: region
     :return: the mastery page
     """
-    summonerDict = getSummoners({"region": region, "summonerNames": summonerName})
+    # Champion name to ID
+    championDict = genChampionDict()
+    championId = championDict[championName]  # name to ID
 
     # Get summoner's ID
+    summonerDict = getSummoners({"region": region, "summonerNames": summonerName})
     if summonerDict:
         nameInLowerCase = list(summonerDict)[0]
         summonerId = summonerDict[nameInLowerCase]["id"]
@@ -336,14 +340,12 @@ def printMasteriesOfASummonerWithAChampion(summonerName, championName, region="e
     :param championName: champion name
     :param region: region
     """
-    championDict = genChampionDict()
     print "Summoner |{summonerName}| is recently playing |{championName}| with masteries:".format(
         summonerName=summonerName,
         championName=championName
     )
 
-    championId = championDict[championName] # name to ID
-    masteries = getMasteriesBySummonerAndChampion(summonerName, championId, region)
+    masteries = getMasteriesBySummonerAndChampion(summonerName, championName, region)
     masteryDict = genMasteryDict()
     for mastery in masteries:
         print "{masterName} * {rank}:\n  {description}".format(
@@ -357,15 +359,17 @@ def printMasteriesOfASummonerWithAChampion(summonerName, championName, region="e
 
 
 def main():
-    cd = genChampionDict()
-    cns = cd.keys()
-    cns.sort()
-    for cn in cns:
-        print '                  <option value="{cn}">{cn}</option>'.format(
-            cn=cn
-        )
-    # printMasteriesOfASummonerWithAChampion("Hide on bush", "Corki", "kr")
+    # cd = genChampionDict()
+    # cns = cd.keys()
+    # cns.sort()
+    # for cn in cns:
+    #     print '                  <option value="{cn}">{cn}</option>'.format(
+    #         cn=cn
+    #     )
 
+    # printMasteriesOfASummonerWithAChampion("Hide on bush", "Corki", "kr")
+    masteries = getMasteriesBySummonerAndChampion("Hide on bush", "Corki", "kr")
+    print formatMasteries(masteries)
 
 if __name__ == "__main__":
     main()

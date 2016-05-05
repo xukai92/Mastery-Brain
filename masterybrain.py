@@ -14,12 +14,22 @@ def root():
 def search():
     error = None
     if request.method == 'POST':
+        # get query from form
         summonerName = request.form['summonerName']
         championName = request.form['championName']
         region = request.form['region']
-        print summonerName, championName, region
-        # TODO: pass the formatted masteries to template
-        return render_template('mastery.html', error=error)
+
+        # get master info
+        masteries = api.getMasteriesBySummonerAndChampion(summonerName, championName, region)
+        masterySet = api.formatMasteries(masteries)
+
+        # format parameters
+        param = dict()
+        param["summonerName"] = summonerName
+        param["championName"] = championName
+        param["region"] = region
+        param["masterySet"] = masterySet
+        return render_template('mastery.html', error=error, param=param)
     return render_template('search.html', error=error)
 
 
