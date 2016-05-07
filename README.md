@@ -1,4 +1,4 @@
-# Mastery-Brain
+# Mastery Brain
 
 This application aimed to help users learn how to set up their mastery page from other players (e.g. professional players).
 
