@@ -1,7 +1,6 @@
 """
 API for fetching mastery page from a given summoner.
 """
-# TODO: add error logs
 
 
 import json
@@ -202,7 +201,7 @@ def championId2Name(championId, region="euw"):
                 return championName
         return None
     else:
-        exit(1)
+        return None
 
 
 def genChampionDict(region="euw"):
@@ -218,7 +217,7 @@ def genChampionDict(region="euw"):
             championDict[championName] = championInfo["data"][championName]["id"]
         return championDict
     else:
-        exit(1)
+        return None
 
 
 def getMasteryInfo(params):
@@ -274,7 +273,7 @@ def genMasteryDict(region="euw"):
             masteryDict[int(masteryId)] = masteryInfo["data"][masteryId]
         return masteryDict
     else:
-        exit(1)
+        return None
 
 
 def formatMasteries(masteries):
@@ -315,7 +314,7 @@ def getMasteriesBySummonerAndChampion(summonerName, championName, region="euw"):
         nameInLowerCase = list(summonerDict)[0]
         summonerId = summonerDict[nameInLowerCase]["id"]
     else:
-        exit(1)
+        return None
 
     # Get summoner's match list
     matchList = getMatchList({"region": region, "summonerId": summonerId})
@@ -325,7 +324,7 @@ def getMasteriesBySummonerAndChampion(summonerName, championName, region="euw"):
         matchIdList = [match["matchId"] for match in filteredMatchList["matches"]]
         latestMatchID = matchIdList[0]  # get the lastest one
     else:
-        exit(1)
+        return None
 
     # Get match by match ID
     match = getMatchByMatchId({"region": region, "matchId": latestMatchID})
@@ -335,7 +334,7 @@ def getMasteriesBySummonerAndChampion(summonerName, championName, region="euw"):
             if participant["championId"] == championId:
                 return participant["masteries"]
     else:
-        exit(1)
+        return None
 
 
 def printMasteriesOfASummonerWithAChampion(summonerName, championName, region="euw"):

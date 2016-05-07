@@ -21,15 +21,18 @@ def search():
 
         # get master info
         masteries = api.getMasteriesBySummonerAndChampion(summonerName, championName, region)
-        masterySet = api.formatMasteries(masteries)
+        if masteries:
+            masterySet = api.formatMasteries(masteries)
 
-        # format parameters
-        param = dict()
-        param["summonerName"] = summonerName
-        param["championName"] = championName
-        param["region"] = region
-        param["masterySet"] = masterySet
-        return render_template('mastery.html', error=error, param=param)
+            # format parameters
+            param = dict()
+            param["summonerName"] = summonerName
+            param["championName"] = championName
+            param["region"] = region
+            param["masterySet"] = masterySet
+            return render_template('mastery.html', error=error, param=param)
+        else:
+            error = "summoner name not found."
     return render_template('search.html', error=error)
 
 
