@@ -2,6 +2,8 @@
 
 This application aimed to help users learn how to set up their mastery page from other players (e.g. professional players).
 
+It's now available online here: [Mastery Brain](http://lol.kbb2ybb.xyz/search_mastery).
+
 ## Usage
 
 Simply type the player's summoner name, select the champion and region to search.
